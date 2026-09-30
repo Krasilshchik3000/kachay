@@ -19,8 +19,9 @@ RUN pip install .
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Без инструкции VOLUME: Railway её не принимает, а docker-compose монтирует /data сам.
 ENV DOWNLOAD_DIR=/data
-VOLUME ["/data"]
+RUN mkdir -p /data
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["python", "-m", "kachay"]
