@@ -72,6 +72,7 @@ def main() -> None:
     logging.basicConfig(
         level=getattr(logging, settings.log_level, logging.INFO),
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        stream=sys.stdout,  # иначе хостинги (Railway) показывают каждую строку как error
     )
     logging.getLogger("aiogram.event").setLevel(logging.WARNING)
     _check_tools(settings)
