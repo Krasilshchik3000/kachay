@@ -33,6 +33,7 @@ class Settings:
     max_video_height: int
     concurrency: int
     log_level: str
+    auto_restart_hours: float
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> Settings:
@@ -71,6 +72,7 @@ class Settings:
             max_video_height=_parse_int(env.get("MAX_VIDEO_HEIGHT"), 1080, "MAX_VIDEO_HEIGHT"),
             concurrency=max(1, _parse_int(env.get("CONCURRENCY"), 2, "CONCURRENCY")),
             log_level=env.get("LOG_LEVEL", "").strip().upper() or "INFO",
+            auto_restart_hours=_parse_float(env.get("AUTO_RESTART_HOURS"), 24.0, "AUTO_RESTART_HOURS"),
         )
 
 
@@ -122,6 +124,18 @@ def _parse_ids(raw: str) -> frozenset[int]:
         except ValueError as exc:
             raise ConfigError(f"ALLOWED_USER_IDS: «{part}» — не число") from exc
     return frozenset(ids)
+
+
+def _parse_float(raw: str | None, default: float, name: str) -> float:
+    if raw is None or not raw.strip():
+        return default
+    try:
+        value = float(raw.strip())
+    except ValueError as exc:
+        raise ConfigError(f"{name}: «{raw}» — не число") from exc
+    if value < 0:
+        raise ConfigError(f"{name} не может быть отрицательным")
+    return value
 
 
 def _parse_int(raw: str | None, default: int, name: str) -> int:

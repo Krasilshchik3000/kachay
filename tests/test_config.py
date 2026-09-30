@@ -50,3 +50,10 @@ def test_cookies_from_plain_env_normalizes_newlines(tmp_path):
 def test_bad_base64_is_a_config_error(tmp_path):
     with pytest.raises(ConfigError):
         Settings.from_env({**BASE, "DOWNLOAD_DIR": str(tmp_path), "COOKIES_B64": "not base64!!"})
+
+
+def test_auto_restart_hours(tmp_path):
+    assert Settings.from_env({**BASE, "DOWNLOAD_DIR": str(tmp_path)}).auto_restart_hours == 24.0
+    assert Settings.from_env({**BASE, "DOWNLOAD_DIR": str(tmp_path), "AUTO_RESTART_HOURS": "0"}).auto_restart_hours == 0
+    with pytest.raises(ConfigError):
+        Settings.from_env({**BASE, "DOWNLOAD_DIR": str(tmp_path), "AUTO_RESTART_HOURS": "-1"})

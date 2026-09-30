@@ -23,6 +23,7 @@ class DownloadService:
         self.ytdlp = YtDlpDownloader(settings)
         self.instagram = InstagramDownloader(settings, self.ytdlp)
         self.semaphore = asyncio.Semaphore(settings.concurrency)
+        self.active_jobs = 0
         settings.download_dir.mkdir(parents=True, exist_ok=True)
 
     @contextlib.asynccontextmanager
@@ -44,6 +45,13 @@ class DownloadService:
         return dst
 
     async def download(self, req: LinkRequest, workdir: Path) -> DownloadResult:
+        self.active_jobs += 1
+        try:
+            return await self._download(req, workdir)
+        finally:
+            self.active_jobs -= 1
+
+    async def _download(self, req: LinkRequest, workdir: Path) -> DownloadResult:
         limit = self.settings.max_upload_bytes
         cookies = self._cookies_copy(workdir)
         if req.audio:

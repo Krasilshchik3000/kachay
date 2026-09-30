@@ -78,6 +78,7 @@ def _settings(tmp_path: Path) -> Settings:
         max_video_height=1080,
         concurrency=1,
         log_level="INFO",
+        auto_restart_hours=0,
     )
 
 
