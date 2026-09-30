@@ -38,7 +38,9 @@ def _check_tools(settings: Settings) -> None:
             settings.js_runtime,
         )
     if settings.cookies_file is None:
-        log.warning("COOKIES_FILE не задан: Instagram, скорее всего, будет требовать логин.")
+        log.warning("Cookies не заданы: Instagram, скорее всего, будет требовать логин.")
+    else:
+        log.info("Cookies: %s (%d байт)", settings.cookies_file, settings.cookies_file.stat().st_size)
     log.info(
         "Лимит отправки %d МБ, API: %s, разрешённые user id: %s",
         settings.max_upload_bytes // (1024 * 1024),
