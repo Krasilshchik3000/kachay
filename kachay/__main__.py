@@ -37,6 +37,15 @@ def _check_tools(settings: Settings) -> None:
             "JS-рантайм «%s» не найден в PATH — YouTube работать не будет (см. README).",
             settings.js_runtime,
         )
+    if settings.pot_provider_url:
+        try:
+            import yt_dlp_plugins.extractor.getpot_bgutil_http  # noqa: F401
+        except ImportError:
+            log.error("YTDLP_POT_PROVIDER_URL задан, но плагин bgutil-ytdlp-pot-provider не установлен")
+        else:
+            log.info("PO-токены: плагин bgutil установлен, сервер %s", settings.pot_provider_url)
+    if settings.youtube_clients:
+        log.info("Клиенты YouTube: %s", ", ".join(settings.youtube_clients))
     if settings.cookies_file is None:
         log.warning("Cookies не заданы: Instagram, скорее всего, будет требовать логин.")
     else:

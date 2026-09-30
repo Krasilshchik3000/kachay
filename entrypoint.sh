@@ -19,6 +19,7 @@ fi
 
 # Плагин PO-токенов ставим только если настроен сервер: без него он лишь шумит в логах.
 if [ -n "${YTDLP_POT_PROVIDER_URL:-}" ]; then
+    echo "[entrypoint] ставлю плагин PO-токенов (YTDLP_POT_PROVIDER_URL=$YTDLP_POT_PROVIDER_URL)..."
     pip install -q --root-user-action=ignore -U bgutil-ytdlp-pot-provider \
         || echo "[entrypoint] не удалось поставить bgutil-ytdlp-pot-provider"
 fi

@@ -29,6 +29,7 @@ class Settings:
     telegram_api_base: str | None
     js_runtime: str
     pot_provider_url: str | None
+    youtube_clients: tuple[str, ...]
     proxy: str | None
     max_video_height: int
     concurrency: int
@@ -68,6 +69,9 @@ class Settings:
             telegram_api_base=api_base,
             js_runtime=env.get("YTDLP_JS_RUNTIME", "").strip() or "deno",
             pot_provider_url=env.get("YTDLP_POT_PROVIDER_URL", "").strip() or None,
+            youtube_clients=tuple(
+                c.strip() for c in env.get("YTDLP_YOUTUBE_CLIENTS", "").split(",") if c.strip()
+            ),
             proxy=env.get("DOWNLOAD_PROXY", "").strip() or None,
             max_video_height=_parse_int(env.get("MAX_VIDEO_HEIGHT"), 1080, "MAX_VIDEO_HEIGHT"),
             concurrency=max(1, _parse_int(env.get("CONCURRENCY"), 2, "CONCURRENCY")),

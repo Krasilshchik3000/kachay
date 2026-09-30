@@ -57,3 +57,9 @@ def test_auto_restart_hours(tmp_path):
     assert Settings.from_env({**BASE, "DOWNLOAD_DIR": str(tmp_path), "AUTO_RESTART_HOURS": "0"}).auto_restart_hours == 0
     with pytest.raises(ConfigError):
         Settings.from_env({**BASE, "DOWNLOAD_DIR": str(tmp_path), "AUTO_RESTART_HOURS": "-1"})
+
+
+def test_youtube_clients_parsed(tmp_path):
+    s = Settings.from_env({**BASE, "DOWNLOAD_DIR": str(tmp_path), "YTDLP_YOUTUBE_CLIENTS": " tv, web_embedded ,,web"})
+    assert s.youtube_clients == ("tv", "web_embedded", "web")
+    assert Settings.from_env({**BASE, "DOWNLOAD_DIR": str(tmp_path)}).youtube_clients == ()

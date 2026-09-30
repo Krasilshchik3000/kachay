@@ -74,6 +74,7 @@ def _settings(tmp_path: Path) -> Settings:
         telegram_api_base=None,
         js_runtime="deno",
         pot_provider_url=None,
+        youtube_clients=(),
         proxy=None,
         max_video_height=1080,
         concurrency=1,

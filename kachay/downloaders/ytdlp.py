@@ -119,8 +119,15 @@ class YtDlpDownloader:
             opts["cookiefile"] = str(cookies)
         if s.proxy:
             opts["proxy"] = s.proxy
+        extractor_args: dict[str, dict[str, list[str]]] = {}
         if s.pot_provider_url:
-            opts["extractor_args"] = {"youtubepot-bgutilhttp": {"base_url": [s.pot_provider_url]}}
+            extractor_args["youtubepot-bgutilhttp"] = {"base_url": [s.pot_provider_url]}
+        if s.youtube_clients:
+            # Какие клиенты YouTube пробовать. С IP дата-центров web/visionos часто получают
+            # «Sign in to confirm you're not a bot», а tv / web_embedded — нет.
+            extractor_args["youtube"] = {"player_client": list(s.youtube_clients)}
+        if extractor_args:
+            opts["extractor_args"] = extractor_args
         return opts
 
     def _probe(self, url: str, opts: dict[str, Any]) -> dict[str, Any]:
