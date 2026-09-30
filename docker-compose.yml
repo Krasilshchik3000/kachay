@@ -1,0 +1,36 @@
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./cookies:/cookies:ro
+      - data:/data
+
+  # --- Опционально: PO-токены для YouTube (если с IP сервера YouTube ругается на ботов) ---
+  # Запуск: docker compose --profile pot up -d
+  # В .env: YTDLP_POT_PROVIDER_URL=http://pot-provider:4416
+  pot-provider:
+    image: brainicism/bgutil-ytdlp-pot-provider
+    profiles: ["pot"]
+    restart: unless-stopped
+    init: true
+
+  # --- Опционально: локальный Bot API сервер, чтобы слать файлы до 2 ГБ вместо 50 МБ ---
+  # Запуск: docker compose --profile local-api up -d
+  # В .env: TELEGRAM_API_BASE=http://telegram-bot-api:8081, TELEGRAM_API_ID, TELEGRAM_API_HASH
+  # Перед первым запуском выполни logOut у официального API (см. README).
+  telegram-bot-api:
+    image: aiogram/telegram-bot-api:latest
+    profiles: ["local-api"]
+    restart: unless-stopped
+    environment:
+      TELEGRAM_API_ID: ${TELEGRAM_API_ID:-}
+      TELEGRAM_API_HASH: ${TELEGRAM_API_HASH:-}
+      TELEGRAM_LOCAL: "1"
+    volumes:
+      - tgapi:/var/lib/telegram-bot-api
+
+volumes:
+  data:
+  tgapi:
