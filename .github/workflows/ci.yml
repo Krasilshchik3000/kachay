@@ -54,10 +54,10 @@ jobs:
             pip install -q pytest
             cd /app && pytest -q
           '
-      - name: Конфиг без токена завершает процесс с понятной ошибкой
+      - name: Конфиг без токена завершает процесс с понятной ошибкой (без entrypoint, у него пауза 5 минут)
         run: |
           set +e
-          out=$(docker run --rm -e UPDATE_ON_START=0 kachay:ci 2>&1)
+          out=$(docker run --rm --entrypoint python kachay:ci -m kachay 2>&1)
           rc=$?
           echo "$out"
           test $rc -eq 2 && echo "$out" | grep -q "BOT_TOKEN"
