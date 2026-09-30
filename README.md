@@ -19,19 +19,23 @@
 
 ## Быстрый старт (Docker)
 
-1. Создай бота у [@BotFather](https://t.me/BotFather), получи токен.
-2. Узнай свой user id: напиши [@userinfobot](https://t.me/userinfobot).
-3. Экспортируй cookies из браузера (см. ниже) в `cookies/cookies.txt`.
-4. Настрой окружение:
-   ```bash
-   cp .env.example .env
-   # впиши BOT_TOKEN и ALLOWED_USER_IDS
-   ```
-5. Запусти:
-   ```bash
-   docker compose up -d --build
-   docker compose logs -f bot
-   ```
+```bash
+git clone https://github.com/Krasilshchik3000/kachay.git && cd kachay
+./setup.sh
+```
+
+Скрипт спросит токен (создай бота у [@BotFather](https://t.me/BotFather)) и user id, запишет `.env`, соберёт образ и запустит бота. Свой user id можно не знать заранее: после запуска напиши боту `/start`, он ответит id, впиши его в `.env` и выполни `docker compose up -d`.
+
+Потом положи cookies в `cookies/cookies.txt` (см. ниже) — без них Instagram не работает.
+
+То же руками:
+```bash
+cp .env.example .env      # впиши BOT_TOKEN и ALLOWED_USER_IDS
+docker compose up -d --build
+docker compose logs -f bot
+```
+
+Готовый образ для amd64 и arm64 собирается в GitHub Actions и лежит в `ghcr.io/krasilshchik3000/kachay:latest`. Чтобы не собирать на слабом сервере: `docker compose pull && docker compose up -d --no-build`.
 
 При каждом старте контейнер обновляет yt-dlp и gallery-dl (`UPDATE_ON_START=1`): YouTube и Instagram регулярно ломают старые версии. Перезапуск = обновление: `docker compose restart bot`.
 
@@ -98,7 +102,7 @@ set -a; . ./.env; set +a
 python -m kachay
 ```
 
-Тесты (без сети): `pytest`.
+Тесты (без сети): `pytest`. В CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) дополнительно собирается Docker-образ, внутри него проверяются deno/ffmpeg/yt-dlp/gallery-dl и гоняются тесты, затем образ публикуется в GHCR.
 
 ## Переменные окружения
 

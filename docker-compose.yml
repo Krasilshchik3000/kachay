@@ -1,5 +1,8 @@
 services:
   bot:
+    # Готовый образ собирается в GitHub Actions. Чтобы не собирать локально:
+    #   docker compose pull && docker compose up -d --no-build
+    image: ghcr.io/krasilshchik3000/kachay:latest
     build: .
     restart: unless-stopped
     env_file: .env

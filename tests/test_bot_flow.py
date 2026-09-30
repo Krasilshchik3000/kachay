@@ -23,7 +23,7 @@ from aiogram.methods import (
 )
 from aiogram.types import CallbackQuery, Chat, Message, Update, User
 
-from kachay.bot import build_router
+from kachay.bot import build_public_router, build_router
 from kachay.config import MB, Settings
 from kachay.downloaders import DownloadError, DownloadResult, MediaItem
 from kachay.sender import TelegramSender
@@ -89,6 +89,7 @@ def _setup(tmp_path: Path, fake_download):
     service.download = fake_download  # type: ignore[method-assign]
     dp = Dispatcher()
     dp.include_router(build_router(settings, service, TelegramSender(bot)))
+    dp.include_router(build_public_router(settings))
     return dp, bot, session
 
 
@@ -110,6 +111,27 @@ def test_stranger_is_ignored(tmp_path):
     result = asyncio.run(dp.feed_update(bot, _text_update("https://youtu.be/dQw4w9WgXcQ", STRANGER)))
     assert result is UNHANDLED
     assert session.requests == []
+
+
+def test_stranger_gets_only_their_id_on_start(tmp_path):
+    async def fake(req, workdir):
+        raise AssertionError("не должно вызываться")
+
+    dp, bot, session = _setup(tmp_path, fake)
+    asyncio.run(dp.feed_update(bot, _text_update("/start", STRANGER)))
+    assert len(session.requests) == 1 and isinstance(session.requests[0], SendMessage)
+    assert f"<code>{STRANGER}</code>" in session.requests[0].text
+    assert "Кинь ссылку" not in session.requests[0].text
+
+
+def test_allowed_user_start_shows_help_and_id(tmp_path):
+    async def fake(req, workdir):
+        raise AssertionError("не должно вызываться")
+
+    dp, bot, session = _setup(tmp_path, fake)
+    asyncio.run(dp.feed_update(bot, _text_update("/start", ALLOWED)))
+    assert len(session.requests) == 1
+    assert "Кинь ссылку" in session.requests[0].text and f"<code>{ALLOWED}</code>" in session.requests[0].text
 
 
 def test_youtube_video_flow_sends_video_with_audio_button(tmp_path):

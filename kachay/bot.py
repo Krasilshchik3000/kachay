@@ -34,6 +34,22 @@ HELP = (
 AUDIO_CB_PREFIX = "audio:"
 
 
+def build_public_router(settings: Settings) -> Router:
+    """Единственное, что видят посторонние: свой user id по /start. Остальное — тишина."""
+    router = Router(name="kachay-public")
+    router.message.filter(~F.from_user.id.in_(settings.allowed_user_ids))
+
+    @router.message(CommandStart())
+    async def on_start_stranger(message: Message) -> None:
+        user_id = message.from_user.id if message.from_user else 0
+        await message.answer(
+            f"Твой user id: <code>{user_id}</code>\n"
+            "Этот бот личный. Чтобы им пользоваться, впиши id в ALLOWED_USER_IDS и перезапусти бота."
+        )
+
+    return router
+
+
 def build_router(settings: Settings, service: DownloadService, sender: TelegramSender) -> Router:
     router = Router(name="kachay")
     allowed = settings.allowed_user_ids
@@ -43,7 +59,8 @@ def build_router(settings: Settings, service: DownloadService, sender: TelegramS
     @router.message(CommandStart())
     @router.message(Command("help"))
     async def on_start(message: Message) -> None:
-        await message.answer(HELP)
+        user_id = message.from_user.id if message.from_user else 0
+        await message.answer(f"{HELP}\n\nТвой user id: <code>{user_id}</code>")
 
     @router.message(F.text)
     async def on_text(message: Message, bot: Bot) -> None:

@@ -11,7 +11,7 @@ from aiogram.client.telegram import TelegramAPIServer
 from aiogram.enums import ParseMode
 
 from . import __version__
-from .bot import build_router
+from .bot import build_public_router, build_router
 from .config import ConfigError, Settings
 from .sender import TelegramSender
 from .service import DownloadService
@@ -69,6 +69,7 @@ def main() -> None:
 
     dp = Dispatcher()
     dp.include_router(build_router(settings, service, sender))
+    dp.include_router(build_public_router(settings))
     dp.run_polling(bot, allowed_updates=["message", "callback_query"])
 
 
